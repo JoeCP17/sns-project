@@ -2,6 +2,7 @@ package com.example.snsproject.domain.member.repository;
 
 import com.example.snsproject.domain.member.entity.Member;
 import java.sql.ResultSet;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
@@ -20,6 +21,21 @@ public class MemberRepository {
 
   private static final String TABLE = "member";
 
+  private static final RowMapper<Member> ROW_MAPPER = (ResultSet rs, int rowNum) -> Member.builder()
+      .id(rs.getLong("id"))
+      .email(rs.getString("email"))
+      .nickName(rs.getString("nickName"))
+      .birthDay(rs.getDate("birthDay").toLocalDate())
+      .createdAt(rs.getTimestamp("createdAt").toLocalDateTime())
+      .build();
+
+  public List<Member> findAllByIdIn(final List<Long> ids) {
+    String sql = String.format("select * from %s where id in (:ids)", TABLE);
+    MapSqlParameterSource params = new MapSqlParameterSource().addValue("ids", ids);
+
+    return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
+  }
+
   public Optional<Member> findById(final Long id) {
     /**
      * select *
@@ -30,15 +46,7 @@ public class MemberRepository {
     MapSqlParameterSource param = new MapSqlParameterSource();
     param.addValue("id", id);
 
-    RowMapper<Member> rowMapper = (ResultSet rs, int rowNum) -> Member.builder()
-        .id(rs.getLong("id"))
-        .email(rs.getString("email"))
-        .nickName(rs.getString("nickName"))
-        .birthDay(rs.getDate("birthDay").toLocalDate())
-        .createdAt(rs.getTimestamp("createdAt").toLocalDateTime())
-        .build();
-
-    Member member = namedParameterJdbcTemplate.queryForObject(sql, param, rowMapper);
+    Member member = namedParameterJdbcTemplate.queryForObject(sql, param, ROW_MAPPER);
 
     return Optional.ofNullable(member);
   }

@@ -1,12 +1,12 @@
 package com.example.snsproject.domain.follow.entity;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 public class Follow {
-
   private final Long id;
 
   private final Long fromMemberId;
@@ -23,9 +23,9 @@ public class Follow {
       final LocalDateTime createdAt
   ) {
     this.id = id;
-    this.fromMemberId = fromMemberId;
-    this.toMemberId = toMemberId;
-    this.createdAt = createdAt;
+    this.fromMemberId = Objects.requireNonNull(fromMemberId);
+    this.toMemberId = Objects.requireNonNull(toMemberId);
+    this.createdAt = createdAt == null ? LocalDateTime.now() : createdAt;
   }
 
 }
