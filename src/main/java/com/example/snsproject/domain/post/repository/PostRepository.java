@@ -37,6 +37,19 @@ public class PostRepository {
 
     throw new UnsupportedOperationException("Post는 갱신을 지원하지 않습니다.");
   }
+  @Transactional
+  public void bulkInsert(final List<Post> posts) {
+    String sql = String.format(
+        "insert into %s (memberId, contents, createdDate, createdAt)"
+        + "values (:memberId, :contents, :createdDate, :createdAt)",
+        TABLE);
+
+    SqlParameterSource[] params = posts.stream()
+        .map(BeanPropertySqlParameterSource::new)
+        .toArray(SqlParameterSource[]::new);
+
+    namedParameterJdbcTemplate.batchUpdate(sql, params);
+  }
 
   // TODO : 쿼리 성능개선 문제 해결해보기
   @Transactional(readOnly = true)
