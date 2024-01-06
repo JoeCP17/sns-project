@@ -2,9 +2,16 @@ package com.example.snsproject.domain.post.service;
 
 import com.example.snsproject.domain.post.dto.DailyPostCount;
 import com.example.snsproject.domain.post.dto.DailyPostCountRequest;
+import com.example.snsproject.domain.post.entity.Post;
 import com.example.snsproject.domain.post.repository.PostRepository;
+import com.example.snsproject.util.CusorRequest;
+import com.example.snsproject.util.PageCursor;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PostReadService {
@@ -23,6 +30,16 @@ public class PostReadService {
      * group by createDate memberId;
      */
     return postRepository.groupByCreatedDate(dailyPostCountRequest);
+  }
+
+  @Transactional(readOnly = true)
+  public Page<Post> getPosts(final Long memberId, final Pageable pageable) {
+    return postRepository.findAllByMemberId(memberId, pageable);
+  }
+
+  @Transactional(readOnly = true)
+  public PageCursor getCursorPosts(final Long memberId, final CusorRequest cusorRequest) {
+
   }
 
 }
