@@ -8,7 +8,6 @@ import com.example.snsproject.util.CusorRequest;
 import com.example.snsproject.util.PageCursor;
 import java.util.List;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,8 +37,24 @@ public class PostReadService {
   }
 
   @Transactional(readOnly = true)
-  public PageCursor getCursorPosts(final Long memberId, final CusorRequest cusorRequest) {
+  public PageCursor<Post> getCursorPosts(final Long memberId, final CusorRequest cusorRequest) {
+    List<Post> posts = findAllBy(memberId, cusorRequest);
+    long nextIdx = posts
+        .stream()
+        .mapToLong(Post::getId).min()
+        .orElse(CusorRequest.NONE_KEY);
 
+    return new PageCursor<>(cusorRequest.next(nextIdx), posts);
+  }
+
+
+  private List<Post> findAllBy(final Long memberId, final CusorRequest cusorRequest) {
+    if (cusorRequest.hasKey()) {
+      return postRepository.findAllByMemberIdAndIdDescAboutCusor(cusorRequest.key(), memberId,
+          cusorRequest.size());
+    } else {
+      return postRepository.findAllByMemberIdAndIdDescAboutCusor(memberId, cusorRequest.size());
+    }
   }
 
 }

@@ -1,9 +1,9 @@
 package com.example.snsproject.domain.post.repository;
 
-import com.example.snsproject.util.PageHelper;
 import com.example.snsproject.domain.post.dto.DailyPostCount;
 import com.example.snsproject.domain.post.dto.DailyPostCountRequest;
 import com.example.snsproject.domain.post.entity.Post;
+import com.example.snsproject.util.PageHelper;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -100,6 +100,37 @@ public class PostRepository {
 
     List<Post> posts = namedParameterJdbcTemplate.query(sql, params, POST_ROW_MAPPER);
     return new PageImpl<>(posts, pageable, getCount(memberId));
+  }
+
+  public List<Post> findAllByMemberIdAndIdDescAboutCusor(final Long memberId, final Long size) {
+    String sql = String.format(
+        "select * "
+            + "from %s "
+            + "where memberId = :memberId "
+            + "limit :size",
+        TABLE);
+
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    params.addValue("memberId", memberId);
+    params.addValue("size", size);
+
+    return namedParameterJdbcTemplate.query(sql, params, POST_ROW_MAPPER);
+  }
+
+  public List<Post> findAllByMemberIdAndIdDescAboutCusor(final Long id, final Long memberId, final Long size) {
+    String sql = String.format(
+        "select * "
+            + "from %s "
+            + "where memberId = :memberId and id < :id "
+            + "limit :size",
+        TABLE);
+
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    params.addValue("memberId", memberId);
+    params.addValue("id", id);
+    params.addValue("size", size);
+
+    return namedParameterJdbcTemplate.query(sql, params, POST_ROW_MAPPER);
   }
 
   private Long getCount(final Long memberId) {

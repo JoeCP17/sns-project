@@ -6,6 +6,8 @@ import com.example.snsproject.domain.post.dto.PostCommand;
 import com.example.snsproject.domain.post.entity.Post;
 import com.example.snsproject.domain.post.service.PostReadService;
 import com.example.snsproject.domain.post.service.PostWriteService;
+import com.example.snsproject.util.CusorRequest;
+import com.example.snsproject.util.PageCursor;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +42,14 @@ public class PostController {
       Pageable pageable
   ) {
     return postReadService.getPosts(memberId, pageable);
+  }
+
+  @GetMapping("/members/{memberId}/cusor")
+  public PageCursor<Post> getPostsByCusor(
+      @PathVariable final Long memberId,
+      CusorRequest cusorRequest
+  ) {
+    return postReadService.getCursorPosts(memberId, cusorRequest);
   }
 
   @PostMapping("")
