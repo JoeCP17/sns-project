@@ -1,6 +1,6 @@
 package com.example.snsproject.util;
 
-public record CusorRequest(
+public record CursorRequest(
     Long key,
     Long size
 ) {
@@ -10,8 +10,8 @@ public record CusorRequest(
     return key != null;
   }
 
-  public CusorRequest next(final Long key) {
-    return new CusorRequest(key, size);
+  public CursorRequest next(final Long key) {
+    return new CursorRequest(key, size);
   }
 
 }

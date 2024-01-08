@@ -133,6 +133,45 @@ public class PostRepository {
     return namedParameterJdbcTemplate.query(sql, params, POST_ROW_MAPPER);
   }
 
+  public List<Post> findAllByMemberIdsAndIdDescAboutCusor(final List<Long> memberIds, final Long size) {
+    if (memberIds.isEmpty()) {
+      return List.of();
+    }
+
+    String sql = String.format(
+        "select * "
+            + "from %s "
+            + "where memberId = :memberId In (:memberIds) "
+            + "limit :size",
+        TABLE);
+
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    params.addValue("memberIds", memberIds);
+    params.addValue("size", size);
+
+    return namedParameterJdbcTemplate.query(sql, params, POST_ROW_MAPPER);
+  }
+
+  public List<Post> findAllByMemberIdsAndIdDescAboutCusor(final Long id, final List<Long> memberIds, final Long size) {
+    if (memberIds.isEmpty()) {
+      return List.of();
+    }
+
+    String sql = String.format(
+        "select * "
+            + "from %s "
+            + "where memberId = :memberId In (:memberIds) and id < :id "
+            + "limit :size",
+        TABLE);
+
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    params.addValue("memberIds", memberIds);
+    params.addValue("id", id);
+    params.addValue("size", size);
+
+    return namedParameterJdbcTemplate.query(sql, params, POST_ROW_MAPPER);
+  }
+
   private Long getCount(final Long memberId) {
     String sql = String.format(
         "select count(id) "

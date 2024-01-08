@@ -4,7 +4,7 @@ import com.example.snsproject.domain.post.dto.DailyPostCount;
 import com.example.snsproject.domain.post.dto.DailyPostCountRequest;
 import com.example.snsproject.domain.post.entity.Post;
 import com.example.snsproject.domain.post.repository.PostRepository;
-import com.example.snsproject.util.CusorRequest;
+import com.example.snsproject.util.CursorRequest;
 import com.example.snsproject.util.PageCursor;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -37,23 +37,44 @@ public class PostReadService {
   }
 
   @Transactional(readOnly = true)
-  public PageCursor<Post> getCursorPosts(final Long memberId, final CusorRequest cusorRequest) {
-    List<Post> posts = findAllBy(memberId, cusorRequest);
-    long nextIdx = posts
+  public PageCursor<Post> getCursorPostsWithMemberId(final Long memberId, final CursorRequest cursorRequest) {
+    List<Post> posts = findAllBy(memberId, cursorRequest);
+    long nextIdx = getNextIdx(posts);
+
+    return new PageCursor<>(cursorRequest.next(nextIdx), posts);
+  }
+
+  @Transactional(readOnly = true)
+  public PageCursor<Post> getCursorPostsWithMemberIds(final List<Long> memberIds, final CursorRequest cursorRequest) {
+    List<Post> posts = findAllBy(memberIds, cursorRequest);
+    long nextIdx = getNextIdx(posts);
+
+    return new PageCursor<>(cursorRequest.next(nextIdx), posts);
+  }
+
+  private static long getNextIdx(List<Post> posts) {
+    return posts
         .stream()
         .mapToLong(Post::getId).min()
-        .orElse(CusorRequest.NONE_KEY);
-
-    return new PageCursor<>(cusorRequest.next(nextIdx), posts);
+        .orElse(CursorRequest.NONE_KEY);
   }
 
 
-  private List<Post> findAllBy(final Long memberId, final CusorRequest cusorRequest) {
-    if (cusorRequest.hasKey()) {
-      return postRepository.findAllByMemberIdAndIdDescAboutCusor(cusorRequest.key(), memberId,
-          cusorRequest.size());
+  private List<Post> findAllBy(final Long memberId, final CursorRequest cursorRequest) {
+    if (cursorRequest.hasKey()) {
+      return postRepository.findAllByMemberIdAndIdDescAboutCusor(cursorRequest.key(), memberId,
+          cursorRequest.size());
     } else {
-      return postRepository.findAllByMemberIdAndIdDescAboutCusor(memberId, cusorRequest.size());
+      return postRepository.findAllByMemberIdAndIdDescAboutCusor(memberId, cursorRequest.size());
+    }
+  }
+
+  private List<Post> findAllBy(final List<Long> memberId, final CursorRequest cursorRequest) {
+    if (cursorRequest.hasKey()) {
+      return postRepository.findAllByMemberIdsAndIdDescAboutCusor(cursorRequest.key(), memberId,
+          cursorRequest.size());
+    } else {
+      return postRepository.findAllByMemberIdsAndIdDescAboutCusor(memberId, cursorRequest.size());
     }
   }
 

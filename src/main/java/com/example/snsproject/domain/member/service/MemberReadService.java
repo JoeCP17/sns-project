@@ -8,16 +8,24 @@ import com.example.snsproject.domain.member.repository.MemberNicknameHistoryRepo
 import com.example.snsproject.domain.member.repository.MemberRepository;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MemberReadService {
 
   private final MemberRepository memberRepository;
 
   private final MemberNicknameHistoryRepository memberNicknameHistoryRepository;
+
+  public MemberReadService(
+      final MemberRepository memberRepository,
+      final MemberNicknameHistoryRepository memberNicknameHistoryRepository
+  ) {
+    this.memberRepository = memberRepository;
+    this.memberNicknameHistoryRepository = memberNicknameHistoryRepository;
+  }
 
   public MemberDto getMember(final Long id) {
     Member member = memberRepository.findById(id).orElseThrow();

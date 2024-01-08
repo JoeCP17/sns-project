@@ -5,7 +5,6 @@ import com.example.snsproject.domain.follow.service.FollowReadService;
 import com.example.snsproject.domain.member.dto.MemberDto;
 import com.example.snsproject.domain.member.service.MemberReadService;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service

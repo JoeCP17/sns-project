@@ -8,11 +8,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class MemberWriteService {
   private final MemberRepository memberRepository;
 
   private final MemberNicknameHistoryRepository memberNicknameHistoryRepository;
+
+  public MemberWriteService(
+      final MemberRepository memberRepository,
+      final MemberNicknameHistoryRepository memberNicknameHistoryRepository
+  ) {
+    this.memberRepository = memberRepository;
+    this.memberNicknameHistoryRepository = memberNicknameHistoryRepository;
+  }
 
   public void register(RegisterMemberCommand command) {
     /**

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 @Service
+@Transactional
 public class FollowWriteService {
 
   private final FollowRepository followRepository;
@@ -16,7 +17,6 @@ public class FollowWriteService {
     this.followRepository = followRepository;
   }
 
-  @Transactional
   public void create(final MemberDto fromMember, final MemberDto toMember) {
     /**
      * from, to 회원정보를 받는다.
